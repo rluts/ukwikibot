@@ -4,13 +4,12 @@ import wikipedia
 import telebot
 import re
 import logging
-import time
 
 bot = telebot.TeleBot(config.token)
 wikipedia.set_lang('uk')
 
-logging.basicConfig(format = u'%(levelname)-8s [%(asctime)s] %(message)s: /wiki message',
-                    level = logging.DEBUG, filename = u'tgbotlog.log')
+logging.basicConfig(format=u'%(levelname)-8s [%(asctime)s] %(message)s',
+                    level=logging.INFO, filename=u'tgbotlog.log')
 
         
 @bot.message_handler(commands=['start', 'help'])
