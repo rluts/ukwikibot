@@ -1020,3 +1020,45 @@ Traceback (most recent call last):
 ApiException: A request to the Telegram API was unsuccessful. The server returned HTTP 409 Conflict. Response body:
 [{"ok":false,"error_code":409,"description":"Conflict: terminated by other getUpdates request; make sure that only one bot instance is running"}]
 : message parser
+INFO     [2019-06-11 22:25:36,751] Starting new HTTPS connection (1): api.telegram.org: /wiki message
+INFO     [2019-06-11 22:25:46,028] Starting new HTTPS connection (1): api.telegram.org: /wiki message
+DEBUG    [2019-06-11 22:25:46,330] "GET /bot393054933:AAFVYFt0zRFbwV0TkaTItI63YOvt6YN7VFs/getUpdates?offset=1&timeout=20 HTTP/1.1" 409 143: /wiki message
+ERROR    [2019-06-11 22:25:46,368] ApiException occurred, args=('A request to the Telegram API was unsuccessful. The server returned HTTP 409 Conflict. Response body:\n[b\'{"ok":false,"error_code":409,"description":"Conflict: terminated by other getUpdates request; make sure that only one bot instance is running"}\']',)
+Traceback (most recent call last):
+  File "/home/rluts/PycharmProjects/ukwikibot/.env/lib/python3.6/site-packages/telebot/util.py", line 59, in run
+    task(*args, **kwargs)
+  File "/home/rluts/PycharmProjects/ukwikibot/.env/lib/python3.6/site-packages/telebot/__init__.py", line 276, in __retrieve_updates
+    updates = self.get_updates(offset=(self.last_update_id + 1), timeout=timeout)
+  File "/home/rluts/PycharmProjects/ukwikibot/.env/lib/python3.6/site-packages/telebot/__init__.py", line 246, in get_updates
+    json_updates = apihelper.get_updates(self.token, offset, limit, timeout, allowed_updates)
+  File "/home/rluts/PycharmProjects/ukwikibot/.env/lib/python3.6/site-packages/telebot/apihelper.py", line 180, in get_updates
+    return _make_request(token, method_url, params=payload)
+  File "/home/rluts/PycharmProjects/ukwikibot/.env/lib/python3.6/site-packages/telebot/apihelper.py", line 56, in _make_request
+    return _check_result(method_name, result)['result']
+  File "/home/rluts/PycharmProjects/ukwikibot/.env/lib/python3.6/site-packages/telebot/apihelper.py", line 75, in _check_result
+    raise ApiException(msg, method_name, result)
+telebot.apihelper.ApiException: A request to the Telegram API was unsuccessful. The server returned HTTP 409 Conflict. Response body:
+[b'{"ok":false,"error_code":409,"description":"Conflict: terminated by other getUpdates request; make sure that only one bot instance is running"}']
+: /wiki message
+INFO     [2019-06-11 22:25:51,422] Starting new HTTPS connection (1): api.telegram.org: /wiki message
+DEBUG    [2019-06-11 22:26:07,497] "GET /bot393054933:AAFVYFt0zRFbwV0TkaTItI63YOvt6YN7VFs/getUpdates?offset=1&timeout=20 HTTP/1.1" 200 387: /wiki message
+INFO     [2019-06-11 22:26:07,521] Starting new HTTPS connection (1): api.telegram.org: /wiki message
+DEBUG    [2019-06-11 22:26:07,982] "POST /bot393054933:AAFVYFt0zRFbwV0TkaTItI63YOvt6YN7VFs/sendMessage?chat_id=398480532&text=https%3A%2F%2Fuk.wikipedia.org HTTP/1.1" 200 327: /wiki message
+DEBUG    [2019-06-11 22:26:26,052] "GET /bot393054933:AAFVYFt0zRFbwV0TkaTItI63YOvt6YN7VFs/getUpdates?offset=952968010&timeout=20 HTTP/1.1" 200 435: /wiki message
+INFO     [2019-06-11 22:26:26,058] Starting new HTTP connection (1): uk.wikipedia.org: /wiki message
+DEBUG    [2019-06-11 22:26:26,147] "GET /w/api.php?list=search&srprop=&srlimit=1&limit=1&srsearch=%D1%85%D0%BC%D0%B5%D0%BB%D1%8C%D0%BD%D0%B8%D1%86%D1%8C%D0%BA%D0%B8%D0%B9%3F&srinfo=suggestion&format=json&action=query HTTP/1.1" 301 0: /wiki message
+INFO     [2019-06-11 22:26:26,154] Starting new HTTPS connection (1): uk.wikipedia.org: /wiki message
+DEBUG    [2019-06-11 22:26:26,631] "GET /w/api.php?list=search&srprop=&srlimit=1&limit=1&srsearch=%D1%85%D0%BC%D0%B5%D0%BB%D1%8C%D0%BD%D0%B8%D1%86%D1%8C%D0%BA%D0%B8%D0%B9%3F&srinfo=suggestion&format=json&action=query HTTP/1.1" 200 None: /wiki message
+INFO     [2019-06-11 22:26:26,636] Starting new HTTP connection (1): uk.wikipedia.org: /wiki message
+DEBUG    [2019-06-11 22:26:26,720] "GET /w/api.php?prop=info%7Cpageprops&inprop=url&ppprop=disambiguation&redirects=&titles=%D0%A5%D0%BC%D0%B5%D0%BB%D1%8C%D0%BD%D0%B8%D1%86%D1%8C%D0%BA%D0%B8%D0%B9&format=json&action=query HTTP/1.1" 301 0: /wiki message
+INFO     [2019-06-11 22:26:26,726] Starting new HTTPS connection (1): uk.wikipedia.org: /wiki message
+DEBUG    [2019-06-11 22:26:27,067] "GET /w/api.php?prop=info%7Cpageprops&inprop=url&ppprop=disambiguation&redirects=&titles=%D0%A5%D0%BC%D0%B5%D0%BB%D1%8C%D0%BD%D0%B8%D1%86%D1%8C%D0%BA%D0%B8%D0%B9&format=json&action=query HTTP/1.1" 200 317: /wiki message
+INFO     [2019-06-11 22:26:27,075] Starting new HTTP connection (1): uk.wikipedia.org: /wiki message
+DEBUG    [2019-06-11 22:26:27,156] "GET /w/api.php?prop=extracts&explaintext=&titles=%D0%A5%D0%BC%D0%B5%D0%BB%D1%8C%D0%BD%D0%B8%D1%86%D1%8C%D0%BA%D0%B8%D0%B9&exsentences=5&format=json&action=query HTTP/1.1" 301 0: /wiki message
+INFO     [2019-06-11 22:26:27,161] Starting new HTTPS connection (1): uk.wikipedia.org: /wiki message
+DEBUG    [2019-06-11 22:26:27,691] "GET /w/api.php?prop=extracts&explaintext=&titles=%D0%A5%D0%BC%D0%B5%D0%BB%D1%8C%D0%BD%D0%B8%D1%86%D1%8C%D0%BA%D0%B8%D0%B9&exsentences=5&format=json&action=query HTTP/1.1" 200 647: /wiki message
+INFO     [2019-06-11 22:26:27,696] Starting new HTTPS connection (1): api.telegram.org: /wiki message
+DEBUG    [2019-06-11 22:26:28,071] "POST /bot393054933:AAFVYFt0zRFbwV0TkaTItI63YOvt6YN7VFs/sendMessage?chat_id=398480532&text=%D0%A5%D0%BC%D0%B5%D0%BB%D1%8C%D0%BD%D0%B8%CC%81%D1%86%D1%8C%D0%BA%D0%B8%D0%B9+%28%D0%9C%D0%A4%D0%90%3A+%5Bxme%CA%8E%CB%88n%CC%AA%C9%AAt%CD%A1s%CA%B2k%C9%AAi%CC%AF%5D+%28+%D0%BF%D1%80%D0%BE%D1%81%D0%BB%D1%83%D1%85%D0%B0%D1%82%D0%B8%29%3B+%D0%B4%D0%BE+1793+%D1%80%D0%BE%D0%BA%D1%83+%E2%80%94+%D0%9F%D0%BB%D0%BE%D1%81%D0%BA%D0%B8%CC%81%D1%80%D1%96%D0%B2%2C+%D0%B7+1795+%D0%BF%D0%BE+1954+%E2%80%94+%D0%9F%D1%80%D0%BE%D1%81%D0%BA%D1%83%CC%81%D1%80%D1%96%D0%B2%29+%E2%80%94+%D0%B0%D0%B4%D0%BC%D1%96%D0%BD%D1%96%D1%81%D1%82%D1%80%D0%B0%D1%82%D0%B8%D0%B2%D0%BD%D0%B8%D0%B9+%D1%86%D0%B5%D0%BD%D1%82%D1%80+%D0%A5%D0%BC%D0%B5%D0%BB%D1%8C%D0%BD%D0%B8%D1%86%D1%8C%D0%BA%D0%BE%D1%97+%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%96+%D1%96+%D0%A5%D0%BC%D0%B5%D0%BB%D1%8C%D0%BD%D0%B8%D1%86%D1%8C%D0%BA%D0%BE%D0%B3%D0%BE+%D1%80%D0%B0%D0%B9%D0%BE%D0%BD%D1%83%2C+%D0%B7%D0%BD%D0%B0%D1%87%D0%BD%D0%B8%D0%B9+%D1%96%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%87%D0%BD%D0%B8%D0%B9+%D1%82%D0%B0+%D1%81%D1%83%D1%87%D0%B0%D1%81%D0%BD%D0%B8%D0%B9+%D0%B5%D0%BA%D0%BE%D0%BD%D0%BE%D0%BC%D1%96%D1%87%D0%BD%D0%B8%D0%B9+%D1%96+%D0%BA%D1%83%D0%BB%D1%8C%D1%82%D1%83%D1%80%D0%BD%D0%B8%D0%B9+%D1%86%D0%B5%D0%BD%D1%82%D1%80+%D0%9F%D0%BE%D0%B4%D1%96%D0%BB%D0%BB%D1%8F.%0A%D0%9D%D0%B0%D1%81%D0%B5%D0%BB%D0%B5%D0%BD%D0%BD%D1%8F+%E2%80%94+271+%D1%82%D0%B8%D1%81.+%282019%29.%0A%D0%9C%D1%96%D1%81%D1%82%D0%BE+%D1%80%D0%BE%D0%B7%D1%82%D0%B0%D1%88%D0%BE%D0%B2%D0%B0%D0%BD%D0%B5+%D0%BD%D0%B0+%D0%97%D0%B0%D1%85%D1%96%D0%B4%D0%BD%D0%BE%D0%BC%D1%83+%D0%9F%D0%BE%D0%B4%D1%96%D0%BB%D0%BB%D1%96%2C+%D0%BD%D0%B0+%D0%B1%D0%B5%D1%80%D0%B5%D0%B3%D0%B0%D1%85+%D0%9F%D1%96%D0%B2%D0%B4%D0%B5%D0%BD%D0%BD%D0%BE%D0%B3%D0%BE+%D0%91%D1%83%D0%B3%D1%83%2C+%D0%B7%D0%B0+376+%D0%BA%D0%BC+%28%D0%B0%D0%B2%D1%82%D0%BE%D0%BC%D0%BE%D0%B1%D1%96%D0%BB%D1%8C%D0%BD%D0%B8%D0%B9+%D1%88%D0%BB%D1%8F%D1%85%29+%D0%B2%D1%96%D0%B4+%D0%9A%D0%B8%D1%94%D0%B2%D0%B0.+%D0%97%D0%B0%D0%BB%D1%96%D0%B7%D0%BD%D0%B8%D1%87%D0%BD%D0%B8%D0%B9+%D0%B2%D1%83%D0%B7%D0%BE%D0%BB+%28%D1%81%D1%82%D0%B0%D0%BD%D1%86%D1%96%D1%97+%D0%A5%D0%BC%D0%B5%D0%BB%D1%8C%D0%BD%D0%B8%D1%86%D1%8C%D0%BA%D0%B8%D0%B9%2C+%D0%93%D1%80%D0%B5%D1%87%D0%B0%D0%BD%D0%B8%29.&parse_mode=HTML HTTP/1.1" 200 2334: /wiki message
+DEBUG    [2019-06-11 22:26:46,181] "GET /bot393054933:AAFVYFt0zRFbwV0TkaTItI63YOvt6YN7VFs/getUpdates?offset=952968011&timeout=20 HTTP/1.1" 200 23: /wiki message
+DEBUG    [2019-06-11 22:27:06,279] "GET /bot393054933:AAFVYFt0zRFbwV0TkaTItI63YOvt6YN7VFs/getUpdates?offset=952968011&timeout=20 HTTP/1.1" 200 23: /wiki message
+DEBUG    [2019-06-11 22:27:26,377] "GET /bot393054933:AAFVYFt0zRFbwV0TkaTItI63YOvt6YN7VFs/getUpdates?offset=952968011&timeout=20 HTTP/1.1" 200 23: /wiki message

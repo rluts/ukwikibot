@@ -9,6 +9,9 @@ import time
 bot = telebot.TeleBot(config.token)
 wikipedia.set_lang('uk')
 
+logging.basicConfig(format = u'%(levelname)-8s [%(asctime)s] %(message)s: /wiki message',
+                    level = logging.DEBUG, filename = u'tgbotlog.log')
+
         
 @bot.message_handler(commands=['start', 'help'])
 def staart_messages(message):
@@ -24,22 +27,25 @@ WikiBot: https://uk.wikipedia.org/wiki/Вікіпедія
 
 Ви: /wiki
 WikiBot: https://uk.wikipedia.org""", parse_mode='HTML')
-    except:
-        logging.basicConfig(format = u'%(levelname)-8s [%(asctime)s] %(message)s: /start message', level = logging.DEBUG, filename = u'tgbotlog.log')
+    except Exception as e:
+        logging.error("Can not sent start message: {}".format(e))
+
 
 @bot.message_handler(commands=['wiki'])
 def wiki_message(message):
     try:
         bot.send_message(message.chat.id, "https://uk.wikipedia.org") 
-    except:
-        logging.basicConfig(format = u'%(levelname)-8s [%(asctime)s] %(message)s: /wiki message', level = logging.DEBUG, filename = u'tgbotlog.log')
+    except Exception as e:
+        logging.error("Can not sent link message: {}".format(e))
+
 
 @bot.message_handler(commands=['random'])
 def wiki_message(message):
     try:
         bot.send_message(message.chat.id, wikipedia.summary(wikipedia.random(1), sentences=5).replace("\n==", "\n<b>").replace("==\n", "</b>\n"), parse_mode='HTML')
-    except:
-        logging.basicConfig(format = u'%(levelname)-8s [%(asctime)s] %(message)s: /wiki message', level = logging.DEBUG, filename = u'tgbotlog.log')
+    except Exception as e:
+        logging.error("Can not sent random message: {}".format(e))
+
 
 @bot.message_handler(content_types=["text"])
 def parse_messages(message):
@@ -51,21 +57,24 @@ def parse_messages(message):
         r = re.search(r"\[\[(.+)\]\]", message.text)
         if r:
             bot.send_message(message.chat.id, "https://uk.wikipedia.org/wiki/" + r.group(1).replace(' ', '_'))
-    except:
-        logging.basicConfig(format = u'%(levelname)-8s [%(asctime)s] %(message)s: link message', level = logging.DEBUG, filename = u'tgbotlog.log')
+    except Exception as e:
+        logging.error("Can not sent parsing link message".format(e))
     try:
         r = re.search(r"([шщШЩ]о таке |[Хх]то такий |[Хх]то так[аіе] )(.+)\??", message.text)
         if "rluts" in r.group(2).lower():
-            bot.send_message(message.chat.id, 'RLuts — це мій творець. Якщо ви хочете розширити мій функціонал і у вас є гарні ідеї або ж виправити в мені якусь помилку — пишіть йому: @rluts')
+            bot.send_message(message.chat.id, 'RLuts — це мій творець. Якщо ви хочете розширити '
+                                              'мій функціонал і у вас є гарні ідеї або ж виправити '
+                                              'в мені якусь помилку — пишіть йому: @rluts')
         elif r:
-            bot.send_message(message.chat.id, wikipedia.summary(r.group(2), sentences=5).replace("\n==", "\n<b>").replace("==\n", "</b>\n"), parse_mode='HTML')
-    except:
-        logging.basicConfig(format = u'%(levelname)-8s [%(asctime)s] %(message)s: message parser', level = logging.DEBUG, filename = u'tgbotlog.log')
+            bot.send_message(message.chat.id, wikipedia.summary(r.group(2), sentences=5)
+                             .replace("\n==", "\n<b>").replace("==\n", "</b>\n"), parse_mode='HTML')
+    except Exception as e:
+        logging.error("Can not sent message: {}".format(e))
+
 
 if __name__ == '__main__':
     while True:
         try:
             bot.polling(none_stop=True)
-        except:
-            logging.basicConfig(format = u'%(levelname)-8s [%(asctime)s] %(message)s: polling', level = logging.DEBUG, filename = u'tgbotlog.log')
-         
+        except Exception as e:
+            logging.error("Unknown error: {}".format(e))
