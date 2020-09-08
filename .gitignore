@@ -1,0 +1,11 @@
+venv/
+env/
+.venv/
+.env
+*.log
+*.pyc
+*.pyi
+*.db
+throttle.ctrl
+tgbotlog.log
+pywikibot.lwp

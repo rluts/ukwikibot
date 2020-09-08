@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
+import urllib
+
+import requests
+
 import config
 import wikipedia
 import telebot
 import re
 import logging
+import pywikibot
 
 bot = telebot.TeleBot(config.token)
 wikipedia.set_lang('uk')
@@ -53,9 +58,13 @@ def parse_messages(message):
             bot.send_message(message.chat.id, "https://uk.wikipedia.org")
         if "@ukwikibot" in message.text.lower():
             bot.send_message(message.chat.id, "Га?")
-        r = re.search(r"\[\[(.+)\]\]", message.text)
+        r = re.findall(r"\[\[(.+?)]]", message.text)
         if r:
-            bot.send_message(message.chat.id, "https://uk.wikipedia.org/wiki/" + r.group(1).replace(' ', '_'))
+            for url in r:
+                response = requests.get("https://uk.wikipedia.org/wiki/" + url.replace(' ', '_'))
+                if response.status_code == 200:
+                    url = urllib.parse.unquote(response.url)
+                    bot.send_message(message.chat.id, url)
     except Exception as e:
         logging.error("Can not sent parsing link message".format(e))
     try:
@@ -72,8 +81,4 @@ def parse_messages(message):
 
 
 if __name__ == '__main__':
-    while True:
-        try:
-            bot.polling(none_stop=True)
-        except Exception as e:
-            logging.error("Unknown error: {}".format(e))
+    bot.polling(none_stop=True)
