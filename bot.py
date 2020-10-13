@@ -1,16 +1,17 @@
-# -*- coding: utf-8 -*-
+import os
 import urllib
 
 import requests
 
-import config
 import wikipedia
 import telebot
 import re
 import logging
 import pywikibot
 
-bot = telebot.TeleBot(config.token)
+from wiki import WikipediaParser
+
+bot = telebot.TeleBot(os.environ.get('TELEGRAM_TOKEN', None))
 wikipedia.set_lang('uk')
 
 logging.basicConfig(format=u'%(levelname)-8s [%(asctime)s] %(message)s',
@@ -74,8 +75,11 @@ def parse_messages(message):
                                               'мій функціонал і у вас є гарні ідеї або ж виправити '
                                               'в мені якусь помилку — пишіть йому: @rluts')
         elif r:
-            bot.send_message(message.chat.id, wikipedia.summary(r.group(2), sentences=5)
-                             .replace("\n==", "\n<b>").replace("==\n", "</b>\n"), parse_mode='HTML')
+            query = r.group(2)
+            parser = WikipediaParser()
+            text = parser.search_and_parse(query)
+            if text:
+                bot.send_message(message.chat.id, text, parse_mode='HTML')
     except Exception as e:
         logging.error("Can not sent message: {}".format(e))
 
