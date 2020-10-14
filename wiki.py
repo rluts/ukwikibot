@@ -2,7 +2,6 @@ import re
 from urllib.parse import unquote
 
 import pywikibot
-import requests
 
 
 class WikipediaParser:
@@ -21,36 +20,51 @@ class WikipediaParser:
 
         return page
 
-    def summary(self, title):
-        # TODO: rework to pywikibot
+    def get_plain_text(self, page: pywikibot.Page):
         params = {
             'action': 'query',
             'prop': 'extracts',
             'exsentences': 7,
             'explaintext': 1,
             'format': 'json',
-            'titles': title.title()
+            'titles': page.title()
         }
-        response = requests.get(f'https://uk.wikipedia.org/w/api.php', params=params)
-        if response.status_code == 200:
-            try:
-                return self.parse_text(next(iter(response.json()['query']['pages'].values()), None)['extract'])
-            except (KeyError, TypeError):
-                pass
+        request = self.site._simple_request(**params)
+        response = request.submit()
+        try:
+            return self.parse_text(next(iter(response['query']['pages'].values()), None)['extract'])
+        except (KeyError, TypeError):
+            pass
 
     @staticmethod
-    def parse_text(text):
+    def parse_text(text: str):
         return re.sub('={2,} ?(.+?)={2,}', r'<b>\1</b>', text)
 
-    def search_and_parse(self, text):
-        page = self.search_page(text)
+    def get_page_summary(self, page: pywikibot.Page) -> [str, None]:
+        if page is None:
+            return
 
-        html = self.summary(page)
+        html = self.get_plain_text(page)
         link = f'<a href="{unquote(page.full_url())}">Читати у Вікіпедії</a>'
 
         return f'{html}\n\n{link}'
 
+    def get_random_page(self) -> pywikibot.Page:
+        generator = self.site.randompages(total=1, redirects=False, namespaces=[0])
+
+        return next(iter(generator), None)
+
+    def random(self) -> str:
+        page = self.get_random_page()
+
+        return self.get_page_summary(page)
+
+    def search(self, text: str) -> [str, None]:
+        page = self.search_page(text)
+
+        return self.get_page_summary(page)
+
 
 if __name__ == '__main__':
     parser = WikipediaParser()
-    text = parser.search_and_parse('Шевченко')
+    print(parser.search('Шевченко'))
