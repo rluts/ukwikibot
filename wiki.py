@@ -1,9 +1,8 @@
 import re
-from datetime import date
 from urllib.parse import unquote
 
+import pymorphy2
 import pywikibot
-
 
 MONTH_MAP = [
     'січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня',
@@ -66,6 +65,15 @@ class WikipediaParser:
 
         return self.get_page_summary(page)
 
+    def get_gender(self, page):
+        item = pywikibot.ItemPage.fromPage(page)
+        wb_item = next(iter(item.claims['P21']), None)
+        if wb_item.target.title() == 'Q6581097':
+            return 'male'
+        elif wb_item.target.title() == 'Q6581072':
+            return 'female'
+        return 'unknown'
+
     def get_birthday(self, page):
         return self.get_wikidata_date(page, 'P569')
 
@@ -89,6 +97,23 @@ class WikipediaParser:
         except (KeyError, IndexError):
             pass
 
+    def get_images_genitive(self, text: str):
+        page = self.genitive_search(text)
+        try:
+            item = pywikibot.ItemPage.fromPage(page)
+            wb_item = next(iter(item.claims['P18']), None)
+            if wb_item:
+                return wb_item.target.get_file_url(url_width=800)
+        except (AttributeError, KeyError, IndexError, ValueError):
+            pass
+
+    def genitive_search(self, text: str) -> [str, None]:
+        morph = pymorphy2.MorphAnalyzer(lang='uk')
+        for word in reversed(morph.parse(text)):
+            page = self.search_page(word.normal_form)
+            if page:
+                return page
+
     def search(self, text: str) -> [str, None]:
         page = self.search_page(text)
 
@@ -97,6 +122,5 @@ class WikipediaParser:
 
 if __name__ == '__main__':
     parser = WikipediaParser()
-    page = parser.search_page('нетішин')
-    print(page)
-    print(parser.get_coords(page))
+    page = parser.genitive_search('Віталій Кличко')
+    print(parser.get_gender(page))

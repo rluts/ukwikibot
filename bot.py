@@ -3,7 +3,7 @@ import os
 
 import telebot
 
-from parser import MessageParser
+from parser import MessageParser, MessageTypes
 
 bot = telebot.TeleBot(os.environ.get('TELEGRAM_TOKEN', None))
 
@@ -15,15 +15,19 @@ logging.basicConfig(format=u'%(levelname)-8s [%(asctime)s] %(message)s',
 def parse_messages(message):
     try:
         parser = MessageParser(message.text)
-        responses = parser.get_response()
-        if isinstance(responses, tuple) and (isinstance(responses[0], float) or isinstance(responses[0], int)):
+        responses, message_type = parser.get_response()
+        if message_type == MessageTypes.COORDS:
             lat, long = responses
             bot.send_location(message.chat.id, lat, long)
-            return
-        elif isinstance(responses, str):
-            responses = [responses]
-        for text in responses:
-            bot.send_message(message.chat.id, text, parse_mode='HTML')
+        elif message_type == MessageTypes.IMAGE:
+            with open(responses, 'rb') as f:
+                bot.send_photo(message.chat.id, f)
+        elif message_type == MessageTypes.TEXT:
+
+            if isinstance(responses, str):
+                responses = [responses]
+            for text in responses:
+                bot.send_message(message.chat.id, text, parse_mode='HTML')
     except Exception as e:
         logging.error("Can not sent message: {}".format(e))
 

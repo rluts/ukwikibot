@@ -1,4 +1,6 @@
+import os
 import re
+import shutil
 from enum import Enum
 from urllib.parse import unquote
 
@@ -8,15 +10,22 @@ from wiki import WikipediaParser
 
 
 class MessageTypes(Enum):
-    WIKI = 'wiki'
-    UKWIKIBOT = 'ukwikibot'
-    WHATIS = 'whatis'
-    LINK = 'link'
-    RANDOM = 'random'
-    HELP = 'help'
-    BIRTHDAY = 'birthday'
-    DEATHDAY = 'deathday'
+    TEXT = 'text'
     COORDS = 'coords'
+    IMAGE = 'image'
+
+
+class Messages(Enum):
+    WIKI = ('wiki', MessageTypes.TEXT)
+    UKWIKIBOT = ('ukwikibot', MessageTypes.TEXT)
+    WHATIS = ('whatis', MessageTypes.TEXT)
+    LINK = ('link', MessageTypes.TEXT)
+    RANDOM = ('random', MessageTypes.TEXT)
+    HELP = ('help', MessageTypes.TEXT)
+    BIRTHDAY = ('birthday', MessageTypes.TEXT)
+    DEATHDAY = ('deathday', MessageTypes.TEXT)
+    COORDS = ('coords', MessageTypes.COORDS)
+    IMAGE = ('image', MessageTypes.IMAGE)
 
 
 HELP_TEXT = """Привіт! Я WikiBot, автоматичний робот, який допоможе вам знайти потрібну \
@@ -46,27 +55,31 @@ class MessageParser:
 
     def get_matches(self):
         if re.search(r"!вікі|!wiki", self.message, re.I) or self.message.lower().strip() == '/wiki':
-            return MessageTypes.WIKI, None
+            return Messages.WIKI, None
         elif "@ukwikibot" in self.message.lower():
-            return MessageTypes.UKWIKIBOT, None
+            return Messages.UKWIKIBOT, None
         elif matches := re.findall(r"\[\[(.+?)]]", self.message):
-            return MessageTypes.LINK, matches
+            return Messages.LINK, matches
         elif matches := re.findall(r'(?:[шщШЩ]о таке |[Хх]то такий |[Хх]то так[аіе] )(.+)\??', self.message):
-            return MessageTypes.WHATIS, matches
-        elif matches := re.findall(re.compile(r'(?:коли народився |дата народження )(.+)\??', flags=re.IGNORECASE),
+            return Messages.WHATIS, matches
+        elif matches := re.findall(re.compile(r'(?:коли народи(?:вся|лась) |дата народження )(.+)\??',
+                                              flags=re.IGNORECASE),
                                    self.message):
-            return MessageTypes.BIRTHDAY, matches
+            return Messages.BIRTHDAY, matches
         elif matches := re.findall(re.compile(r'(?:коли помер |дата смерті )(.+)\??', flags=re.IGNORECASE),
                                    self.message):
-            return MessageTypes.DEATHDAY, matches
+            return Messages.DEATHDAY, matches
+        elif matches := re.findall(re.compile(r'знайди (?:фото |зображення )(.+)\??', flags=re.IGNORECASE),
+                                   self.message):
+            return Messages.IMAGE, matches
         elif matches := re.findall(re.compile(r'(?:де розташован(?:ий|а|е|і) |де знаходиться'
                                               r'|координати )(.+)\??', flags=re.IGNORECASE),
                                    self.message):
-            return MessageTypes.COORDS, matches
+            return Messages.COORDS, matches
         elif self.message.lower().strip() == '/random':
-            return MessageTypes.RANDOM, None
+            return Messages.RANDOM, None
         elif self.message.lower().strip() in ('/start', '/help'):
-            return MessageTypes.HELP, None
+            return Messages.HELP, None
 
     def get_wiki_message(self, *args):
         return "https://uk.wikipedia.org"
@@ -74,14 +87,31 @@ class MessageParser:
     def get_ukwikibot_message(self, *args):
         return "Га?"
 
+    def get_image_message(self, matches):
+        if matches:
+            match = matches[0]
+            parser = WikipediaParser()
+            image_url = parser.get_images_genitive(match)
+            if image_url:
+                r = requests.get(image_url, stream=True)
+                if r.status_code == 200:
+                    r.raw.decode_content = True
+                    filename = os.path.join('tmp', image_url.split('/')[-1])
+                    # Open a local file with wb ( write binary ) permission.
+                    with open(filename, 'wb') as f:
+                        shutil.copyfileobj(r.raw, f)
+                    return filename
+
     def get_birthday_message(self, matches):
         if matches:
             match = matches[0]
             parser = WikipediaParser()
             page = parser.search_page(match)
+            gender = parser.get_gender(page)
             date = parser.get_birthday(page)
+            w = 'народилась' if gender == 'female' else 'народився'
             if date:
-                return f'{page.title()} народився {date}'
+                return f'{page.title()} {w} {date}'
 
     def get_coords_message(self, matches):
         if matches:
@@ -119,7 +149,8 @@ class MessageParser:
             yield parser.search(query)
 
     def get_response(self):
-        message_type, matches = self.get_matches()
-        func = getattr(self, f'get_{message_type.value}_message')
+        message_group, matches = self.get_matches()
+        message_name, message_type = message_group.value
+        func = getattr(self, f'get_{message_name}_message')
 
-        return func(matches)
+        return func(matches), message_type

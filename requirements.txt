@@ -1,7 +1,12 @@
 beautifulsoup4==4.7.1
 certifi==2020.6.20
 chardet==3.0.4
+DAWG-Python==0.7.2
+docopt==0.6.2
 idna==2.10
+pymorphy2==0.9.1
+pymorphy2-dicts-ru==2.4.417127.4579844
+pymorphy2-dicts-uk==2.4.1.1.1460299261
 pyTelegramBotAPI==3.6.6
 pywikibot==4.3.0
 requests==2.24.0
@@ -9,3 +14,4 @@ six==1.12.0
 soupsieve==1.9.1
 urllib3==1.25.10
 Wikidata==0.7.0
+wikipedia==1.4.0
