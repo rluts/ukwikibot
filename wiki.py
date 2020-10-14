@@ -1,7 +1,14 @@
 import re
+from datetime import date
 from urllib.parse import unquote
 
 import pywikibot
+
+
+MONTH_MAP = [
+    'січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня',
+    'жовтня', 'листопада', 'грудня'
+]
 
 
 class WikipediaParser:
@@ -59,6 +66,15 @@ class WikipediaParser:
 
         return self.get_page_summary(page)
 
+    def get_birthday(self, page):
+        try:
+            item = pywikibot.ItemPage.fromPage(page)
+            for wb_item in item.claims['P569']:
+                if 'Q1985727' in wb_item.target.calendarmodel:
+                    return f'{wb_item.target.day} {MONTH_MAP[wb_item.target.month - 1]} {wb_item.target.year}'
+        except (KeyError, IndexError):
+            pass
+
     def search(self, text: str) -> [str, None]:
         page = self.search_page(text)
 
@@ -67,4 +83,6 @@ class WikipediaParser:
 
 if __name__ == '__main__':
     parser = WikipediaParser()
-    print(parser.search('Шевченко'))
+    page = parser.search_page('Джордж Буш старший')
+    print(page)
+    print(parser.get_birthday(page))

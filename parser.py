@@ -14,6 +14,7 @@ class MessageTypes(Enum):
     LINK = 'link'
     RANDOM = 'random'
     HELP = 'help'
+    BIRTHDAY = 'birthday'
 
 
 HELP_TEXT = """Привіт! Я WikiBot, автоматичний робот, який допоможе вам знайти потрібну \
@@ -44,6 +45,9 @@ class MessageParser:
             return MessageTypes.LINK, matches
         elif matches := re.findall(r'(?:[шщШЩ]о таке |[Хх]то такий |[Хх]то так[аіе] )(.+)\??', self.message):
             return MessageTypes.WHATIS, matches
+        elif matches := re.findall(re.compile(r'(?:коли народився |дата народження )(.+)\??', flags=re.IGNORECASE),
+                                   self.message):
+            return MessageTypes.BIRTHDAY, matches
         elif self.message.lower().strip() == '/random':
             return MessageTypes.RANDOM, None
         elif self.message.lower().strip() in ('/start', '/help'):
@@ -54,6 +58,15 @@ class MessageParser:
 
     def get_ukwikibot_message(self, *args):
         return "Га?"
+
+    def get_birthday_message(self, matches):
+        if matches:
+            match = matches[0]
+            parser = WikipediaParser()
+            page = parser.search_page(match)
+            date = parser.get_birthday(page)
+            if date:
+                return f'{page.title()} народився {date}'
 
     def get_link_message(self, matches):
         for url in matches:
