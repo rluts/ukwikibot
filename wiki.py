@@ -67,9 +67,15 @@ class WikipediaParser:
         return self.get_page_summary(page)
 
     def get_birthday(self, page):
+        return self.get_wikidata_date(page, 'P569')
+
+    def get_deathday(self, page):
+        return self.get_wikidata_date(page, 'P570')
+
+    def get_wikidata_date(self, page, prop):
         try:
             item = pywikibot.ItemPage.fromPage(page)
-            for wb_item in item.claims['P569']:
+            for wb_item in item.claims[prop]:
                 if 'Q1985727' in wb_item.target.calendarmodel:
                     return f'{wb_item.target.day} {MONTH_MAP[wb_item.target.month - 1]} {wb_item.target.year}'
         except (KeyError, IndexError):

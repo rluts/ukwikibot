@@ -15,6 +15,7 @@ class MessageTypes(Enum):
     RANDOM = 'random'
     HELP = 'help'
     BIRTHDAY = 'birthday'
+    DEATHDAY = 'deathday'
 
 
 HELP_TEXT = """Привіт! Я WikiBot, автоматичний робот, який допоможе вам знайти потрібну \
@@ -24,6 +25,10 @@ HELP_TEXT = """Привіт! Я WikiBot, автоматичний робот, я
 WikiBot: Вікіпе́дія (англ. Wikipedia, МФА: [ˌwɪkɪˈpiːdɪə]) — загальнодоступна вільна багатомовна онлайн-енциклопедія, \
 якою опікується неприбуткова організація «Фонд Вікімедіа».
 Будь-хто, у кого є доступ до читання Вікіпедії, також може редагувати практично всі її статті.
+Ви: дата народження джорджа буша старшого
+WikiBot: Джордж Герберт Вокер Буш народився 12 червня 1924
+Ви: Коли помер Майкл Джексон?
+WikiBot: Джордж Герберт Вокер Буш народився 12 червня 1924
 
 Ви: [[Вікіпедія]]
 WikiBot: https://uk.wikipedia.org/wiki/Вікіпедія
@@ -48,6 +53,9 @@ class MessageParser:
         elif matches := re.findall(re.compile(r'(?:коли народився |дата народження )(.+)\??', flags=re.IGNORECASE),
                                    self.message):
             return MessageTypes.BIRTHDAY, matches
+        elif matches := re.findall(re.compile(r'(?:коли помер |дата смерті )(.+)\??', flags=re.IGNORECASE),
+                                   self.message):
+            return MessageTypes.DEATHDAY, matches
         elif self.message.lower().strip() == '/random':
             return MessageTypes.RANDOM, None
         elif self.message.lower().strip() in ('/start', '/help'):
@@ -67,6 +75,15 @@ class MessageParser:
             date = parser.get_birthday(page)
             if date:
                 return f'{page.title()} народився {date}'
+
+    def get_deathday_message(self, matches):
+        if matches:
+            match = matches[0]
+            parser = WikipediaParser()
+            page = parser.search_page(match)
+            date = parser.get_deathday(page)
+            if date:
+                return f'{page.title()} помер {date}'
 
     def get_link_message(self, matches):
         for url in matches:
