@@ -72,6 +72,14 @@ class WikipediaParser:
     def get_deathday(self, page):
         return self.get_wikidata_date(page, 'P570')
 
+    def get_coords(self, page):
+        try:
+            item = pywikibot.ItemPage.fromPage(page)
+            for wb_item in item.claims['P625']:
+                return wb_item.target.lat, wb_item.target.lon
+        except (KeyError, IndexError, AttributeError):
+            pass
+
     def get_wikidata_date(self, page, prop):
         try:
             item = pywikibot.ItemPage.fromPage(page)
@@ -89,6 +97,6 @@ class WikipediaParser:
 
 if __name__ == '__main__':
     parser = WikipediaParser()
-    page = parser.search_page('Джордж Буш старший')
+    page = parser.search_page('нетішин')
     print(page)
-    print(parser.get_birthday(page))
+    print(parser.get_coords(page))

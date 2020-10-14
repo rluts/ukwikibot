@@ -16,6 +16,7 @@ class MessageTypes(Enum):
     HELP = 'help'
     BIRTHDAY = 'birthday'
     DEATHDAY = 'deathday'
+    COORDS = 'coords'
 
 
 HELP_TEXT = """Привіт! Я WikiBot, автоматичний робот, який допоможе вам знайти потрібну \
@@ -56,6 +57,10 @@ class MessageParser:
         elif matches := re.findall(re.compile(r'(?:коли помер |дата смерті )(.+)\??', flags=re.IGNORECASE),
                                    self.message):
             return MessageTypes.DEATHDAY, matches
+        elif matches := re.findall(re.compile(r'(?:де розташован(?:ий|а|е) |де знаходиться'
+                                              r'|координати )(.+)\??', flags=re.IGNORECASE),
+                                   self.message):
+            return MessageTypes.COORDS, matches
         elif self.message.lower().strip() == '/random':
             return MessageTypes.RANDOM, None
         elif self.message.lower().strip() in ('/start', '/help'):
@@ -75,6 +80,13 @@ class MessageParser:
             date = parser.get_birthday(page)
             if date:
                 return f'{page.title()} народився {date}'
+
+    def get_coords_message(self, matches):
+        if matches:
+            match = matches[0]
+            parser = WikipediaParser()
+            page = parser.search_page(match)
+            return parser.get_coords(page)
 
     def get_deathday_message(self, matches):
         if matches:

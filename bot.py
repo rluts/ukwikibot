@@ -16,7 +16,11 @@ def parse_messages(message):
     try:
         parser = MessageParser(message.text)
         responses = parser.get_response()
-        if isinstance(responses, str):
+        if len(responses) == 2 and isinstance(responses, tuple) and isinstance(responses[0], float):
+            lat, long = responses
+            bot.send_location(message.chat.id, lat, long)
+            return
+        elif isinstance(responses, str):
             responses = [responses]
         for text in responses:
             bot.send_message(message.chat.id, text, parse_mode='HTML')
