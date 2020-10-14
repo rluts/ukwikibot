@@ -16,8 +16,8 @@ def parse_messages(message):
     try:
         parser = MessageParser(message.text)
         responses = list(parser.get_response())
-        if len(responses) == 2 and isinstance(responses, tuple) and (isinstance(responses[0], float) or
-                                                                     isinstance(responses[0], int)):
+        if len(responses) == 2 and isinstance(responses, list) and (isinstance(responses[0], float) or
+                                                                    isinstance(responses[0], int)):
             lat, long = responses
             bot.send_location(message.chat.id, lat, long)
             return
