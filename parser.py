@@ -59,7 +59,7 @@ class MessageParser:
         elif matches := re.findall(re.compile(r'(?:коли помер |дата смерті )(.+)\??', flags=re.IGNORECASE),
                                    self.message):
             return MessageTypes.DEATHDAY, matches
-        elif matches := re.findall(re.compile(r'(?:де розташован(?:ий|а|е) |де знаходиться'
+        elif matches := re.findall(re.compile(r'(?:де розташован(?:ий|а|е|і) |де знаходиться'
                                               r'|координати )(.+)\??', flags=re.IGNORECASE),
                                    self.message):
             return MessageTypes.COORDS, matches
