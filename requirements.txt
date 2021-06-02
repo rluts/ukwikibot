@@ -12,6 +12,6 @@ pywikibot==4.3.0
 requests==2.24.0
 six==1.12.0
 soupsieve==1.9.1
-urllib3==1.25.10
+urllib3==1.26.5
 Wikidata==0.7.0
 wikipedia==1.4.0
