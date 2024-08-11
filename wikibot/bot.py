@@ -40,12 +40,13 @@ async def parse_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         f"«{commons_category}»"
                         f"</a> на Вікісховищі",
                         parse_mode=ParseMode.HTML,
+                        disable_web_page_preview=True,
                     )
         elif message_type == MessageTypes.TEXT:
             for text in responses:
                 await context.bot.send_message(update.message.chat_id, text, parse_mode=ParseMode.HTML)
-    except Exception as e:
-        logger.error("Can not sent message: {}".format(e))
+    except Exception:  # noqa
+        logger.exception("Can parse message")
 
 
 app.add_handler(MessageHandler(filters=None, callback=parse_messages, block=False))

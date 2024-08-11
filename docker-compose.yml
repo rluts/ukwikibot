@@ -4,5 +4,6 @@ services:
       context: .
     env_file: .env
     command: ["poetry", "run", "python", "run.py"]
+    restart: always
     volumes:
       - ".:/home/ukwikibot/src:z"
