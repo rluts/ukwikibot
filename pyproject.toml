@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "ukwikibot"
+version = "0.3.0"
+description = "Telegram bot for retrieving information from Ukrainian Wikipedia"
+authors = ["rluts <lutsromans@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+wikidata = "^0.8.1"
+pywikibot = "^9.3.1"
+python-telegram-bot = "^21.4"
+pymorphy3 = "^2.0.2"
+pymorphy3-dicts-uk = "^2.4.1.1.1663094765"
+pytest-asyncio = "^0.23.8"
+httpx = {extras = ["http2"], version = "^0.27.0"}
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.8.0"
+ruff = "^0.5.7"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.2"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+builtins = ["_"]
+exclude = ["venv", ".venv", "apicache"]
+line-length = 120
+show-fixes = true
+
+[tool.ruff.lint]
+select = ["E", "F", "C", "I", "Q"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 8
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

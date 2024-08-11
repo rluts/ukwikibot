@@ -7,5 +7,5 @@ env/
 *.pyi
 *.db
 throttle.ctrl
-tgbotlog.log
 pywikibot.lwp
+apicache/
