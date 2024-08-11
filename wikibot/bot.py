@@ -19,8 +19,13 @@ app = ApplicationBuilder().token(token).build()
 
 async def parse_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
+        if not update.message or not update.message.text:
+            return
         parser = MessageParser(update.message.text)
-        responses, message_group = await parser.get_response()
+        parsed = await parser.get_response()
+        if not parsed:
+            return
+        responses, message_group = parsed
         _, message_type = message_group.value
         if message_type == MessageTypes.COORDS and len(responses) > 0:
             for lat, lon in responses:
