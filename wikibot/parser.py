@@ -160,8 +160,11 @@ class MessageParser:
         for query in matches:
             yield await self.wiki_manager.search(query)
 
-    async def get_response(self) -> Tuple[List[Any], Messages]:
-        message_group, matches = await self.get_matches()
+    async def get_response(self) -> Tuple[List[Any], Messages] | None:
+        response = await self.get_matches()
+        if not response:
+            return None
+        message_group, matches = response
         message_name, message_type = message_group.value
         func = getattr(self, f"get_{message_name}_message")
         responses = []

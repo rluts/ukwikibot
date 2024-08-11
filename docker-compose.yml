@@ -1,0 +1,8 @@
+services:
+  app:
+    build:
+      context: .
+    env_file: .env
+    command: ["poetry", "run", "python", "run.py"]
+    volumes:
+      - ".:/home/ukwikibot/src:z"
