@@ -7,6 +7,7 @@ logging.getLogger("httpcore").setLevel(logging.WARNING)
 logging.getLogger("telegram").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 logging.getLogger("pymorphy3").setLevel(logging.WARNING)
+logging.getLogger("hpack").setLevel(logging.WARNING)
 logging.basicConfig(
     level=logging.DEBUG,
 )
