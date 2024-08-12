@@ -34,7 +34,7 @@ async def parse_messages(update: Update, _: ContextTypes.DEFAULT_TYPE):
         if not message_type:
             return
         messages = filter(lambda m: m, messages)
-        if message_type == MessageTypes.COORDS and len(messages) > 0:
+        if message_type == MessageTypes.COORDS:
             await send_coords(update, messages)
         elif message_type == MessageTypes.IMAGE:
             await send_image(update, messages)
