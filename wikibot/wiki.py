@@ -125,22 +125,22 @@ class WikiManager:
     async def get_wikidata_date(self, page, prop) -> str | None:
         return await self.loop.run_in_executor(None, self._get_wikidata_date, page, prop)
 
-    def _get_images_genitive(self, page: pywikibot.Page) -> Tuple[str | None, str | None]:
+    def _get_page_image_info(self, page: pywikibot.Page) -> Tuple[str | None, str | None, str | None]:
         try:
             item = pywikibot.ItemPage.fromPage(page)
             wb_item = next(iter(item.claims["P18"]), None)
             if wb_item:
                 wb_category = next(iter(item.claims["P373"]), None)
-
-                return wb_item.target.get_file_url(url_width=800), wb_category and wb_category.target
+                image_description = wb_item.target.latest_file_info.descriptionurl
+                return wb_item.target.get_file_url(url_width=800), image_description, wb_category and wb_category.target
         except (AttributeError, KeyError, IndexError, ValueError):
-            return None, None
+            return None, None, None
 
-    async def get_images_genitive(self, text: str) -> Tuple[str | None, str | None]:
+    async def get_images_genitive(self, text: str) -> Tuple[str | None, str | None, str | None]:
         page = await self.genitive_search(text)
         if page is None:
-            return None, None
-        return await self.loop.run_in_executor(None, self._get_images_genitive, page)
+            return None, None, None
+        return await self.loop.run_in_executor(None, self._get_page_image_info, page)
 
     async def genitive_search(self, text: str) -> pywikibot.Page | None:
         morph = pymorphy3.MorphAnalyzer(lang="uk")

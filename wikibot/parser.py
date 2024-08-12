@@ -104,12 +104,12 @@ class MessageParser:
     async def get_image_message(self, matches):
         if matches:
             match = matches[0]
-            image_url, commons_category = await self.wiki_manager.get_images_genitive(match)
+            image_url, description_url, commons_category = await self.wiki_manager.get_images_genitive(match)
             if image_url:
                 async with AsyncClient() as client:
                     response = await client.get(image_url)
                     if response.status_code == 200 and response.headers.get("content-type") == "image/jpeg":
-                        yield response.content, commons_category
+                        yield response.content, description_url, commons_category
 
     async def get_birthday_message(self, matches):
         if matches:

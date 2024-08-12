@@ -31,11 +31,12 @@ async def parse_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
             for lat, lon in responses:
                 await context.bot.send_location(update.message.chat_id, lat, lon)
         elif message_type == MessageTypes.IMAGE:
-            for image, commons_category in responses:
+            for image, description_url, commons_category in responses:
                 message = await context.bot.send_photo(update.message.chat_id, photo=image)
                 if commons_category:
                     await message.reply_text(
-                        f"Дивіться також фото в категорії "
+                        f"<a href=\"{description_url}\">Автор та ліцензія.</a> "
+                        f"Дивіться також інші фото в категорії "
                         f'<a href="https://commons.wikimedia.org/wiki/Category:{commons_category}">'
                         f"«{commons_category}»"
                         f"</a> на Вікісховищі",
