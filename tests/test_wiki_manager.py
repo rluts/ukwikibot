@@ -1,6 +1,16 @@
 from wikibot.wiki import WikiManager
 
 
+async def test_genitive_transform():
+    manager = WikiManager()
+    text = await manager.genitive_transform("Володимира Зеленського")
+    text2 = await manager.genitive_transform("Володимир Зеленського")
+    text3 = await manager.genitive_transform("Володимир зеленського")
+    assert text == "Володимир Зеленський"
+    assert text == text2
+    assert text3 == "Володимир зеленський"
+
+
 async def test_genitive_search():
     manager = WikiManager()
     kyiv = await manager.genitive_search("Києва")
@@ -9,8 +19,9 @@ async def test_genitive_search():
 
 async def test_genitive_search_image():
     manager = WikiManager()
-    kyiv, category = await manager.get_images_genitive("Києва")
+    kyiv, description_url, category = await manager.get_images_genitive("Києва")
     assert kyiv.startswith("https://upload.wikimedia.org/wikipedia/commons/thumb/")
+    assert description_url.startswith("https://commons.wikimedia.org/")
     assert category == "Kyiv"
 
 

@@ -29,6 +29,7 @@ class WikiManager:
     def __init__(self):
         self.loop = asyncio.get_running_loop()
         self.site = pywikibot.Site(code="uk", fam="wikipedia")
+        self.morph = pymorphy3.MorphAnalyzer(lang="uk")
 
     def _search_page(self, query: str) -> pywikibot.Page | None:
         page = next(
@@ -126,15 +127,23 @@ class WikiManager:
         return await self.loop.run_in_executor(None, self._get_wikidata_date, page, prop)
 
     def _get_page_image_info(self, page: pywikibot.Page) -> Tuple[str | None, str | None, str | None]:
-        try:
-            item = pywikibot.ItemPage.fromPage(page)
-            wb_item = next(iter(item.claims["P18"]), None)
-            if wb_item:
-                wb_category = next(iter(item.claims["P373"]), None)
-                image_description = wb_item.target.latest_file_info.descriptionurl
-                return wb_item.target.get_file_url(url_width=800), image_description, wb_category and wb_category.target
-        except (AttributeError, KeyError, IndexError, ValueError):
+        item = pywikibot.ItemPage.fromPage(page)
+        photo_bytes = None
+        image_description = None
+        category = None
+
+        if item is None:
             return None, None, None
+
+        wb_items = item.claims.get("P18")
+        if wb_items:
+            wb_item = wb_items[0]
+            photo_bytes = wb_item.target.get_file_url(url_width=800)
+            image_description = wb_item.target.latest_file_info.descriptionurl
+        wb_category = item.claims.get("P373")
+        if wb_category:
+            category = wb_category[0].target
+        return photo_bytes, image_description, category
 
     async def get_images_genitive(self, text: str) -> Tuple[str | None, str | None, str | None]:
         page = await self.genitive_search(text)
@@ -142,14 +151,26 @@ class WikiManager:
             return None, None, None
         return await self.loop.run_in_executor(None, self._get_page_image_info, page)
 
+    async def genitive_transform(self, text: str) -> str:
+        word_list = text.split()
+        transformed_word_list = []
+        for word in word_list:
+            transformed_word = word
+            for w in reversed(self.morph.parse(word)):
+                if w.tag and w.tag.case == "gent":
+                    transformed_word = w.normal_form
+                    break
+            transformed_word_list.append(transformed_word.capitalize() if word.istitle() else transformed_word)
+        transformed_text = " ".join(transformed_word_list)
+        logger.debug(f"Transforming {text} to {transformed_text}")
+        return transformed_text
+
     async def genitive_search(self, text: str) -> pywikibot.Page | None:
-        morph = pymorphy3.MorphAnalyzer(lang="uk")
-        for word in reversed(morph.parse(text)):
-            logger.debug(f"Transforming {text} to {word.normal_form}")
-            page = await self.search_page(word.normal_form)
-            if page:
-                return page
-            logger.info("Page not found on Wikipedia")
+        text = await self.genitive_transform(text)
+        page = await self.search_page(text)
+        if page:
+            return page
+        logger.info("Page not found on Wikipedia")
 
     async def search(self, text: str) -> str | None:
         page = await self.search_page(text)
