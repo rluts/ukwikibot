@@ -97,7 +97,7 @@ class MessageParser:
             if key in self.message:
                 return value, None
 
-    async def get_ukwikibot_message(self):
+    async def get_ukwikibot_message(self, *args):
         yield "Га?"
 
     async def get_random_command(self):
@@ -161,7 +161,7 @@ class MessageParser:
             for url in matches:
                 url = f"https://uk.wikipedia.org/wiki/{url.replace(' ', '_')}"
                 response = await client.get(url, follow_redirects=True, timeout=10)
-                if response.status_code == 200:
+                if response.status_code != 404:
                     yield unquote(str(response.url))
                 else:
                     logger.info(f"Error while fetching {url}. Status code: {response.status_code}")
