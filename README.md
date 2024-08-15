@@ -1,5 +1,5 @@
 * Telegram Bot for retrieving information from Wikipedia and Wikidata. Now, we support only uk language: https://t.me/ukwikibot
-* v0.3.2
+* v0.3.3
 ### Приклади команд:
 - Ви: Що таке Вікіпедія?
 - WikiBot: Вікіпе́дія (англ. Wikipedia, МФА: [ˌwɪkɪˈpiːdɪə]) — загальнодоступна вільна багатомовна онлайн-енциклопедія, якою опікується неприбуткова організація «Фонд Вікімедіа».
