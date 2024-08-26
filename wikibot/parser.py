@@ -29,6 +29,8 @@ class Messages(Enum):
     COORDS = ("coords", MessageTypes.COORDS)
     COORDS_GEN = ("coords_gen", MessageTypes.COORDS)
     IMAGE = ("image", MessageTypes.IMAGE)
+    FIELD_OF_WORK = ("field_of_work", MessageTypes.TEXT)
+    EDUCATION = ("education", MessageTypes.TEXT)
 
 
 HELP_TEXT = """Привіт! Я WikiBot, автоматичний робот, який допоможе вам знайти потрібну \
@@ -61,14 +63,15 @@ class Matcher(Enum):
 
 class MessageParser:
     REGEXES_MATCH = [
-        (Messages.UKWIKIBOT, r"@ukwikibot"),
         (Messages.WHATIS, r"(?:[шщ]о таке |хто такий |хто так[аіе] )([\w,\s]+)\??"),
         (Messages.LINK, r"\[\[(.+?)]]"),
         (Messages.BIRTHDAY, r"(?:коли народи(?:вся|лась) |дата народження )([\w,\s]+)\??"),
         (Messages.DEATHDAY, r"(?:коли помер(?:ла)? |дата смерті )(.+)\??"),
+        (Messages.FIELD_OF_WORK, r"(?:спеціалізація |сфера роботи )(.+)\??"),
         (Messages.COORDS, r"(?:де розташован(?:ий|а|е|і) |де знаходиться )(.+)\??"),
         (Messages.COORDS_GEN, r"координати (.+)\??"),
         (Messages.IMAGE, r"(?:знайди|покажи) (?:фото |зображення )(.+)\??"),
+        (Messages.UKWIKIBOT, r"@ukwikibot"),
     ]
 
     COMMANDS = {
@@ -169,6 +172,13 @@ class MessageParser:
     async def get_whatis_message(self, matches):
         for query in matches:
             yield await self.wiki_manager.search(query)
+
+    async def get_field_of_work_message(self, matches):
+        for query in matches:
+            value = await self.wiki_manager.get_field_of_work(page=query)
+            logger.error(value)
+            if value:
+                yield value
 
     async def get_command_response(self) -> str:
         message_name, message_type = self.COMMANDS[self.message].value
