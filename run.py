@@ -1,7 +1,5 @@
 import asyncio
 import logging
-from contextlib import asynccontextmanager
-from typing import AsyncIterator
 
 from telegram.ext import Application
 
@@ -38,7 +36,7 @@ async def run_polling(application: Application) -> None:
             await asyncio.sleep(5)
         logging.error("Unexpected stopping the bot")
     except Exception:  # noqa
-        logging.exception(f"Cannot run the bot")
+        logging.exception("Cannot run the bot")
     finally:
         await stop(application)
 
