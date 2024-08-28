@@ -67,7 +67,7 @@ class MessageParser:
         (Messages.LINK, r"\[\[(.+?)]]"),
         (Messages.BIRTHDAY, r"(?:коли народи(?:вся|лась) |дата народження )([\w,\s]+)\??"),
         (Messages.DEATHDAY, r"(?:коли помер(?:ла)? |дата смерті )(.+)\??"),
-        (Messages.FIELD_OF_WORK, r"(?:спеціалізація |сфера роботи )(.+)\??"),
+        (Messages.FIELD_OF_WORK, r"@ukwikibot.*(?:спеціалізація |сфера роботи )(.+)\??"),
         (Messages.COORDS, r"(?:де розташован(?:ий|а|е|і) |де знаходиться )(.+)\??"),
         (Messages.COORDS_GEN, r"координати (.+)\??"),
         (Messages.IMAGE, r"(?:знайди|покажи) (?:фото |зображення )(.+)\??"),
@@ -85,19 +85,19 @@ class MessageParser:
         "@ukwikibot": Messages.UKWIKIBOT,
     }
 
-    def __init__(self, message: str) -> None:
-        self.message = message
+    def __init__(self) -> None:
         self.wiki_manager = WikiManager()
+        self.wiki_manager.login()
         self.regex_match = [
             (message_group, re.compile(regex, re.IGNORECASE)) for message_group, regex in self.REGEXES_MATCH
         ]
 
-    async def get_matches(self) -> Tuple[Messages, List[str] | None]:
+    async def get_matches(self, message: str) -> Tuple[Messages, List[str] | None]:
         for message_type, pattern in self.regex_match:
-            if matches := re.findall(pattern, self.message):
+            if matches := re.findall(pattern, message):
                 return message_type, matches
         for key, value in self.CONTAINS.items():
-            if key in self.message:
+            if key in message:
                 return value, None
 
     async def get_ukwikibot_message(self, *args):
@@ -176,17 +176,17 @@ class MessageParser:
     async def get_field_of_work_message(self, matches):
         for query in matches:
             value = await self.wiki_manager.get_field_of_work(page=query)
-            logger.error(value)
+            logger.debug(f"{query} - {value}")
             if value:
                 yield value
 
-    async def get_command_response(self) -> str:
-        message_name, message_type = self.COMMANDS[self.message].value
+    async def get_command_response(self, message: str) -> str:
+        message_name, message_type = self.COMMANDS[message].value
         func = getattr(self, f"get_{message_name}_command")
         return await func()
 
-    async def get_response(self) -> Tuple[List[Any] | None, MessageTypes | None]:
-        response = await self.get_matches()
+    async def get_response(self, message: str) -> Tuple[List[Any] | None, MessageTypes | None]:
+        response = await self.get_matches(message)
         if not response:
             return None, None
         message_group, matches = response

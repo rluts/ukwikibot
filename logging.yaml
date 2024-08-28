@@ -1,0 +1,52 @@
+version: 1
+disable_existing_loggers: False
+
+formatters:
+  simpleFormatter:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
+handlers:
+  consoleHandler:
+    class: logging.StreamHandler
+    formatter: simpleFormatter
+    level: DEBUG
+    stream: ext://sys.stdout
+
+loggers:
+  httpx:
+    level: WARNING
+    handlers: []
+    propagate: False
+  httpcore:
+    level: WARNING
+    handlers: []
+    propagate: False
+  telegram:
+    level: WARNING
+    handlers: []
+    propagate: False
+  urllib3:
+    level: WARNING
+    handlers: []
+    propagate: False
+  pymorphy3:
+    level: WARNING
+    handlers: []
+    propagate: False
+  hpack:
+    level: WARNING
+    handlers: []
+    propagate: False
+  oauthlib:
+    level: WARNING
+    handlers: [ ]
+    propagate: False
+  requests_oauthlib:
+    level: WARNING
+    handlers: [ ]
+    propagate: False
+
+root:
+  level: DEBUG
+  handlers:
+    - consoleHandler

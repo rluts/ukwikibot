@@ -1,11 +1,13 @@
 import asyncio
 import logging
 import re
-from typing import Tuple, List
+from typing import List, Tuple
 from urllib.parse import unquote
 
 import pymorphy3
-import pywikibot
+import pywikibot.config
+
+from wikibot.config import config
 
 MONTH_MAP = [
     "січня",
@@ -30,6 +32,19 @@ class WikiManager:
         self.loop = asyncio.get_running_loop()
         self.site = pywikibot.Site(code="uk", fam="wikipedia")
         self.morph = pymorphy3.MorphAnalyzer(lang="uk")
+
+    def login(self):
+        if not config.wiki_disable_auth:
+            pywikibot.config.usernames["*"]["*"] = config.wiki_username
+            authenticate = (
+                config.wiki_consumer_token,
+                config.wiki_consumer_secret,
+                config.wiki_access_token,
+                config.wiki_access_secret,
+            )
+            pywikibot.config.authenticate["*"] = authenticate
+            self.site = pywikibot.Site(code="uk", fam="wikipedia")
+            self.site.login()
 
     def _search_page(self, query: str) -> pywikibot.Page | None:
         page = next(
