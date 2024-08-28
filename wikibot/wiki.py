@@ -43,6 +43,7 @@ class WikiManager:
                 config.wiki_access_secret,
             )
             pywikibot.config.authenticate["*"] = authenticate
+            pywikibot.config.put_throttle = 0
             self.site = pywikibot.Site(code="uk", fam="wikipedia")
             self.site.login()
 
