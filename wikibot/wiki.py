@@ -1,11 +1,13 @@
 import asyncio
 import logging
 import re
-from typing import Tuple
+from typing import List, Tuple
 from urllib.parse import unquote
 
 import pymorphy3
-import pywikibot
+import pywikibot.config
+
+from wikibot.config import config
 
 MONTH_MAP = [
     "січня",
@@ -30,6 +32,19 @@ class WikiManager:
         self.loop = asyncio.get_running_loop()
         self.site = pywikibot.Site(code="uk", fam="wikipedia")
         self.morph = pymorphy3.MorphAnalyzer(lang="uk")
+
+    def login(self):
+        if not config.wiki_disable_auth:
+            pywikibot.config.usernames["*"]["*"] = config.wiki_username
+            authenticate = (
+                config.wiki_consumer_token,
+                config.wiki_consumer_secret,
+                config.wiki_access_token,
+                config.wiki_access_secret,
+            )
+            pywikibot.config.authenticate["*"] = authenticate
+            self.site = pywikibot.Site(code="uk", fam="wikipedia")
+            self.site.login()
 
     def _search_page(self, query: str) -> pywikibot.Page | None:
         page = next(
@@ -103,6 +118,16 @@ class WikiManager:
     async def get_deathday(self, page):
         return await self.get_wikidata_date(page, "P570")
 
+    async def get_wikidata_text_list(self, query: str, prop: str) -> str | None:
+        page = await self.genitive_search(query)
+        if not page:
+            return None
+        value = ", ".join(await self.get_wikidata_text(page, prop))
+        return value or None
+
+    async def get_field_of_work(self, page) -> str | None:
+        return await self.get_wikidata_text_list(page, "P101")
+
     def _get_coords(self, page: pywikibot.Page) -> Tuple[float, float] | None:
         try:
             item = pywikibot.ItemPage.fromPage(page)
@@ -122,6 +147,25 @@ class WikiManager:
                     return f"{wb_item.target.day} {MONTH_MAP[wb_item.target.month - 1]} {wb_item.target.year}"
         except (KeyError, IndexError):
             return None
+
+    def _get_wikidata_text(self, page, prop) -> List[str]:
+        items = []
+        item = pywikibot.ItemPage.fromPage(page)
+        logger.debug(f"{page} ({item})")
+        for wb_item in item.claims.get(prop, []):
+            try:
+                if isinstance(wb_item.target, str):
+                    items.append(wb_item.target)
+                elif isinstance(wb_item.target, pywikibot.ItemPage):
+                    target_text = wb_item.target.text.get("labels", {}).get("uk")
+                    if target_text:
+                        items.append(target_text)
+            except (KeyError, TypeError):
+                pass
+        return items
+
+    async def get_wikidata_text(self, page, prop) -> List[str]:
+        return await self.loop.run_in_executor(None, self._get_wikidata_text, page, prop)
 
     async def get_wikidata_date(self, page, prop) -> str | None:
         return await self.loop.run_in_executor(None, self._get_wikidata_date, page, prop)

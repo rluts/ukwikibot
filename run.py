@@ -1,19 +1,17 @@
 import asyncio
 import logging
+import logging.config
 
+import yaml
 from telegram.ext import Application
 
-from wikibot.bot import app
+from wikibot.bot import setup_bot
 
-logging.getLogger("httpx").setLevel(logging.WARNING)
-logging.getLogger("httpcore").setLevel(logging.WARNING)
-logging.getLogger("telegram").setLevel(logging.WARNING)
-logging.getLogger("urllib3").setLevel(logging.WARNING)
-logging.getLogger("pymorphy3").setLevel(logging.WARNING)
-logging.getLogger("hpack").setLevel(logging.WARNING)
-logging.basicConfig(
-    level=logging.DEBUG,
-)
+
+def setup_logging() -> None:
+    with open("logging.yaml", "r") as f:
+        config = yaml.safe_load(f.read())
+        logging.config.dictConfig(config)
 
 
 async def start(application: Application) -> Application:
@@ -29,7 +27,8 @@ async def stop(application: Application) -> None:
     await application.shutdown()
 
 
-async def run_polling(application: Application) -> None:
+async def run_polling() -> None:
+    application = await setup_bot()
     try:
         application = await start(application)
         while application.running:
@@ -42,4 +41,5 @@ async def run_polling(application: Application) -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(run_polling(app))
+    setup_logging()
+    asyncio.run(run_polling())

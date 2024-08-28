@@ -1,4 +1,4 @@
-name: CI
+name: tests
 
 on:
   pull_request:
@@ -11,6 +11,9 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    env:
+      TELEGRAM_TOKEN: "fake-token"
+      WIKI_DISABLE_AUTH: "1"
 
     steps:
     - name: Checkout repository
