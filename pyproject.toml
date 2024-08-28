@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ukwikibot"
-version = "0.3.3"
+version = "0.3.4"
 description = "Telegram bot for retrieving information from Ukrainian Wikipedia"
 authors = ["rluts <lutsromans@gmail.com>"]
 license = "MIT"
