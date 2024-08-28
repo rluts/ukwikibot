@@ -1,7 +1,6 @@
 services:
   app:
-    build:
-      context: .
+    image: "ghcr.io/rluts/ukwikibot:latest"
     env_file: .env
     command: ["poetry", "run", "python", "run.py"]
     restart: always
