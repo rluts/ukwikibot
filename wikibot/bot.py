@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 async def parse_command(message_parser: MessageParser, update: Update, _: ContextTypes.DEFAULT_TYPE):
-    command = update.message.text.lstrip("/").rstrip("@ukwikibot")
+    command = update.message.text.lstrip("/").replace("@ukwikibot", "").lower()
     logger.debug(f"{update.message.text} command")
     if message := await message_parser.get_command_response(command):
         await update.message.reply_text(message, parse_mode=ParseMode.HTML)
